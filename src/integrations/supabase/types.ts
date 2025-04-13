@@ -9,277 +9,62 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      access_logs: {
+      Board_State: {
         Row: {
-          access_point: string | null
-          created_at: string | null
-          id: number
-          rfid_tag: string | null
-          status: string | null
-          user_name: string
-        }
-        Insert: {
-          access_point?: string | null
-          created_at?: string | null
-          id?: number
-          rfid_tag?: string | null
-          status?: string | null
-          user_name: string
-        }
-        Update: {
-          access_point?: string | null
-          created_at?: string | null
-          id?: number
-          rfid_tag?: string | null
-          status?: string | null
-          user_name?: string
-        }
-        Relationships: []
-      }
-      admin_requests: {
-        Row: {
+          complete: boolean | null
           created_at: string
-          id: string
-          reason: string
-          reviewed_at: string | null
-          reviewer_id: string | null
-          status: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          reason: string
-          reviewed_at?: string | null
-          reviewer_id?: string | null
-          status?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          reason?: string
-          reviewed_at?: string | null
-          reviewer_id?: string | null
-          status?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          email: string
-          full_name: string | null
-          id: string
-          role: string
-          updated_at: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          email: string
-          full_name?: string | null
-          id: string
-          role?: string
-          updated_at?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          email?: string
-          full_name?: string | null
-          id?: string
-          role?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      security_events: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          duration: number | null
-          event_type: string | null
+          eraser: number | null
           id: number
-          resolved_at: string | null
-          security_sensors: number | null
-          sensor_id: number | null
-          severity: string | null
-          status: string | null
+          image_url: string | null
         }
         Insert: {
-          created_at?: string | null
-          description?: string | null
-          duration?: number | null
-          event_type?: string | null
+          complete?: boolean | null
+          created_at?: string
+          eraser?: number | null
           id?: number
-          resolved_at?: string | null
-          security_sensors?: number | null
-          sensor_id?: number | null
-          severity?: string | null
-          status?: string | null
+          image_url?: string | null
         }
         Update: {
-          created_at?: string | null
-          description?: string | null
-          duration?: number | null
-          event_type?: string | null
+          complete?: boolean | null
+          created_at?: string
+          eraser?: number | null
           id?: number
-          resolved_at?: string | null
-          security_sensors?: number | null
-          sensor_id?: number | null
-          severity?: string | null
-          status?: string | null
+          image_url?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "security_events_security_sensors_fkey"
-            columns: ["security_sensors"]
+            foreignKeyName: "Board_State_eraser_fkey"
+            columns: ["eraser"]
             isOneToOne: false
-            referencedRelation: "security_sensors"
+            referencedRelation: "Eraser"
             referencedColumns: ["id"]
           },
         ]
       }
-      security_sensors: {
+      Eraser: {
         Row: {
+          "Date installed": string
           id: number
-          location: string | null
           name: string | null
-          type: string | null
+          "number of iterations": number | null
+          "room name": string | null
+          status: string | null
         }
         Insert: {
+          "Date installed"?: string
           id?: number
-          location?: string | null
           name?: string | null
-          type?: string | null
+          "number of iterations"?: number | null
+          "room name"?: string | null
+          status?: string | null
         }
         Update: {
+          "Date installed"?: string
           id?: number
-          location?: string | null
           name?: string | null
-          type?: string | null
-        }
-        Relationships: []
-      }
-      system_status: {
-        Row: {
-          average_temperature: number | null
-          created_at: string
-          id: number
-          network_status: string | null
-          security_status: string | null
-          system_health: number | null
-          temperature_status: string | null
-        }
-        Insert: {
-          average_temperature?: number | null
-          created_at?: string
-          id?: number
-          network_status?: string | null
-          security_status?: string | null
-          system_health?: number | null
-          temperature_status?: string | null
-        }
-        Update: {
-          average_temperature?: number | null
-          created_at?: string
-          id?: number
-          network_status?: string | null
-          security_status?: string | null
-          system_health?: number | null
-          temperature_status?: string | null
-        }
-        Relationships: []
-      }
-      temperature_predictions: {
-        Row: {
-          id: number
-          last_timestamp: string | null
-          predictions: Json | null
-        }
-        Insert: {
-          id?: number
-          last_timestamp?: string | null
-          predictions?: Json | null
-        }
-        Update: {
-          id?: number
-          last_timestamp?: string | null
-          predictions?: Json | null
-        }
-        Relationships: []
-      }
-      temperature_readings: {
-        Row: {
-          created_at: string
-          days_to_failure: number | null
-          fan_status: string | null
-          humidity: number | null
-          id: number
-          sensor_id: number
-          temperature: number | null
-          temperature_sensors: number | null
-          updated_at: string | null
-          voltage: number | null
-          warning_status: boolean | null
-        }
-        Insert: {
-          created_at?: string
-          days_to_failure?: number | null
-          fan_status?: string | null
-          humidity?: number | null
-          id?: number
-          sensor_id: number
-          temperature?: number | null
-          temperature_sensors?: number | null
-          updated_at?: string | null
-          voltage?: number | null
-          warning_status?: boolean | null
-        }
-        Update: {
-          created_at?: string
-          days_to_failure?: number | null
-          fan_status?: string | null
-          humidity?: number | null
-          id?: number
-          sensor_id?: number
-          temperature?: number | null
-          temperature_sensors?: number | null
-          updated_at?: string | null
-          voltage?: number | null
-          warning_status?: boolean | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "temperature_readings_temperature_sensors_fkey"
-            columns: ["temperature_sensors"]
-            isOneToOne: false
-            referencedRelation: "temperature_sensors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      temperature_sensors: {
-        Row: {
-          id: number
-          location: string | null
-          name: string | null
-        }
-        Insert: {
-          id?: number
-          location?: string | null
-          name?: string | null
-        }
-        Update: {
-          id?: number
-          location?: string | null
-          name?: string | null
+          "number of iterations"?: number | null
+          "room name"?: string | null
+          status?: string | null
         }
         Relationships: []
       }

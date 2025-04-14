@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Eraser, BoardState } from '@/types';
 
@@ -64,20 +65,11 @@ export const updateBoardStateDescription = async (id: string, description: strin
 // Function to call Python API for image summarization
 export const getImageSummary = async (imageUrl: string): Promise<string> => {
   try {
-    // Replace with your actual API endpoint
-    const response = await fetch(`http://localhost:5000/api/summarize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ imageUrl }),
+    const { data, error } = await supabase.functions.invoke('summarize-image', {
+      body: { imageUrl }
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to summarize image');
-    }
-
-    const data = await response.json();
+    if (error) throw error;
     return data.summary;
   } catch (error) {
     console.error('Error summarizing image:', error);
@@ -85,9 +77,9 @@ export const getImageSummary = async (imageUrl: string): Promise<string> => {
   }
 };
 
-// Eraser control API
+// Eraser control API - simplified for on/off only
 export const controlEraser = async (
-  action: string,
+  action: 'on' | 'off', 
   raspberryPiUrl: string = 'http://raspberrypi.local:5000'
 ): Promise<{ status: string; message: string }> => {
   try {

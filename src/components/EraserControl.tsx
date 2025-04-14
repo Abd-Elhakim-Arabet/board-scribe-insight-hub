@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Play, Square, Settings } from 'lucide-react';
+import { AlertCircle, Power, Settings } from 'lucide-react';
 import { controlEraser } from '@/services/api';
 import { useToast } from "@/components/ui/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 interface EraserControlProps {
   eraserId: string;
@@ -16,15 +17,18 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [raspberryPiUrl, setRaspberryPiUrl] = useState('http://raspberrypi.local:5000');
   const [showSettings, setShowSettings] = useState(false);
+  const [isOn, setIsOn] = useState(false);
   const { toast } = useToast();
 
-  const handleControl = async (action: string) => {
+  const handleToggle = async (turnOn: boolean) => {
+    const action = turnOn ? 'on' : 'off';
     setIsLoading(true);
     try {
       await controlEraser(action, raspberryPiUrl);
+      setIsOn(turnOn);
       toast({
         title: "Success",
-        description: `Eraser ${action} command sent successfully`,
+        description: `Eraser turned ${action} successfully`,
       });
     } catch (error) {
       console.error('Error:', error);
@@ -64,71 +68,43 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-2">
-          <div></div>
-          <Button
-            variant="outline"
-            onClick={() => handleControl('forward')}
-            disabled={isLoading}
-            className="flex flex-col items-center py-3"
-          >
-            <ArrowUp className="h-5 w-5" />
-            <span className="mt-1 text-xs">Forward</span>
-          </Button>
-          <div></div>
+        <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="mb-6 flex flex-col items-center">
+            <Power 
+              className={`h-16 w-16 ${isOn ? 'text-green-500' : 'text-gray-400'} transition-colors`} 
+              strokeWidth={1.5} 
+            />
+            <p className="mt-2 text-lg font-medium">{isOn ? 'Eraser is ON' : 'Eraser is OFF'}</p>
+          </div>
 
-          <Button
-            variant="outline"
-            onClick={() => handleControl('left')}
-            disabled={isLoading}
-            className="flex flex-col items-center py-3"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="mt-1 text-xs">Left</span>
-          </Button>
-          
-          <Button
-            variant={isLoading ? "outline" : "default"}
-            onClick={() => handleControl('stop')}
-            disabled={isLoading}
-            className="flex flex-col items-center py-3"
-          >
-            <Square className="h-5 w-5" />
-            <span className="mt-1 text-xs">Stop</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500">Off</span>
+            <Switch 
+              checked={isOn} 
+              onCheckedChange={handleToggle} 
+              disabled={isLoading} 
+            />
+            <span className="text-sm text-gray-500">On</span>
+          </div>
 
-          <Button
-            variant="outline"
-            onClick={() => handleControl('right')}
-            disabled={isLoading}
-            className="flex flex-col items-center py-3"
-          >
-            <ArrowRight className="h-5 w-5" />
-            <span className="mt-1 text-xs">Right</span>
-          </Button>
-
-          <div></div>
-          <Button
-            variant="outline"
-            onClick={() => handleControl('backward')}
-            disabled={isLoading}
-            className="flex flex-col items-center py-3"
-          >
-            <ArrowDown className="h-5 w-5" />
-            <span className="mt-1 text-xs">Back</span>
-          </Button>
-          <div></div>
-        </div>
-
-        <div className="mt-4 flex justify-center">
-          <Button
-            onClick={() => handleControl('start_sequence')}
-            disabled={isLoading}
-            className="w-full"
-          >
-            <Play className="mr-2 h-4 w-4" />
-            Run Cleaning Sequence
-          </Button>
+          <div className="flex justify-center mt-6 space-x-4">
+            <Button
+              variant={isOn ? "outline" : "default"}
+              onClick={() => handleToggle(false)}
+              disabled={isLoading || !isOn}
+              className="w-24"
+            >
+              Turn Off
+            </Button>
+            <Button
+              variant={!isOn ? "outline" : "default"}
+              onClick={() => handleToggle(true)}
+              disabled={isLoading || isOn}
+              className="w-24"
+            >
+              Turn On
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

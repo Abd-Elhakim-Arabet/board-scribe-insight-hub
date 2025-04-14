@@ -23,6 +23,14 @@ serve(async (req) => {
       );
     }
 
+    // Validate action is either 'on' or 'off'
+    if (action !== 'on' && action !== 'off') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid action. Use "on" or "off"' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
     // Forward the request to the Raspberry Pi
     const response = await fetch(`${raspberryPiUrl}/control`, {
       method: 'POST',

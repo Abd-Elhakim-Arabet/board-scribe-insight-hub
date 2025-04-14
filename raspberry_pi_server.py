@@ -15,8 +15,8 @@ def control_eraser():
     data = request.json
     action = data.get('action')
     
-    if not action:
-        return jsonify({'status': 'error', 'message': 'Missing action parameter'}), 400
+    if not action or action not in ['on', 'off']:
+        return jsonify({'status': 'error', 'message': 'Invalid action. Use "on" or "off"'}), 400
     
     try:
         # Execute the Python script with the action as an argument
@@ -29,7 +29,7 @@ def control_eraser():
         
         return jsonify({
             'status': 'success',
-            'message': f'Command {action} executed successfully',
+            'message': f'Eraser turned {action} successfully',
             'output': result.stdout
         })
     except subprocess.CalledProcessError as e:

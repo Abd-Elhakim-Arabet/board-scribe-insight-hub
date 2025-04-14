@@ -62,23 +62,18 @@ export const updateBoardStateDescription = async (id: string, description: strin
   if (error) throw error;
 };
 
-// Function to call Python API for image summarization
+// Function to call Supabase Edge Function for image summarization
 export const getImageSummary = async (imageUrl: string): Promise<string> => {
   try {
-    // Replace with your actual API endpoint
-    const response = await fetch(`/api/summarize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ imageUrl }),
+    const { data, error } = await supabase.functions.invoke("summarize-image", {
+      body: { imageUrl },
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to summarize image');
+    if (error) {
+      console.error('Error calling summarize-image function:', error);
+      return 'Unable to generate summary';
     }
 
-    const data = await response.json();
     return data.summary;
   } catch (error) {
     console.error('Error summarizing image:', error);

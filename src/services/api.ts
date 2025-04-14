@@ -86,3 +86,21 @@ export const getImageSummary = async (imageUrl: string): Promise<string> => {
     return 'Unable to generate summary';
   }
 };
+
+// Eraser control API - simplified for on/off only
+export const controlEraser = async (
+  action: 'on' | 'off', 
+  raspberryPiUrl: string = 'http://raspberrypi.local:5000'
+): Promise<{ status: string; message: string }> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('control-eraser', {
+      body: { action, raspberryPiUrl }
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error controlling eraser:', error);
+    throw new Error('Failed to control eraser. Please check Raspberry Pi connection.');
+  }
+};

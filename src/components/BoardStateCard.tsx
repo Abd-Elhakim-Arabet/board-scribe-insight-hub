@@ -46,25 +46,12 @@ const BoardStateCard: React.FC<BoardStateCardProps> = ({ boardState }) => {
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-[4/3] bg-gray-100">
-        <img 
-          src={boardState.imageUrl} 
-          alt="Whiteboard state" 
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Fallback to iframe if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              const iframe = document.createElement('iframe');
-              iframe.src = "https://drive.google.com/file/d/14hsJJjSWAXDzF8Uup_7JQz2rQRTSwPle/preview";
-              iframe.width = "100%";
-              iframe.height = "100%";
-              iframe.allow = "autoplay";
-              parent.appendChild(iframe);
-            }
-          }}
-        />
+      <iframe src="https://drive.google.com/file/d/14hsJJjSWAXDzF8Uup_7JQz2rQRTSwPle/preview" 
+        height="100%" 
+        width="100%" 
+        allow="autoplay" 
+       >
+</iframe>
         <div className="absolute top-2 right-2">
           {boardState.isComplete ? (
             <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">

@@ -7,9 +7,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app) 
 
-# Load Gemini Vision model
 llm = ChatGoogleGenerativeAI(
-    model="gemini-pro-vision",
+    model="gemini-2.0-flash-001",
     temperature=0,
     max_tokens=None,
     timeout=None,

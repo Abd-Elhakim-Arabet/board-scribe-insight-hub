@@ -11,28 +11,25 @@ export type Database = {
     Tables: {
       Board_State: {
         Row: {
-          description: string | null
+          complete: boolean | null
+          created_at: string
           eraser: number | null
           id: number
-          imageUrl: string | null
-          isComplete: boolean | null
-          timestamp: string
+          image_url: string | null
         }
         Insert: {
-          description?: string | null
+          complete?: boolean | null
+          created_at?: string
           eraser?: number | null
           id?: number
-          imageUrl?: string | null
-          isComplete?: boolean | null
-          timestamp?: string
+          image_url?: string | null
         }
         Update: {
-          description?: string | null
+          complete?: boolean | null
+          created_at?: string
           eraser?: number | null
           id?: number
-          imageUrl?: string | null
-          isComplete?: boolean | null
-          timestamp?: string
+          image_url?: string | null
         }
         Relationships: [
           {
@@ -46,27 +43,27 @@ export type Database = {
       }
       Eraser: {
         Row: {
-          dateInstalled: string
-          erasureCount: number | null
+          "Date installed": string
           id: number
           name: string | null
-          room: string | null
+          "number of iterations": number | null
+          "room name": string | null
           status: string | null
         }
         Insert: {
-          dateInstalled?: string
-          erasureCount?: number | null
+          "Date installed"?: string
           id?: number
           name?: string | null
-          room?: string | null
+          "number of iterations"?: number | null
+          "room name"?: string | null
           status?: string | null
         }
         Update: {
-          dateInstalled?: string
-          erasureCount?: number | null
+          "Date installed"?: string
           id?: number
           name?: string | null
-          room?: string | null
+          "number of iterations"?: number | null
+          "room name"?: string | null
           status?: string | null
         }
         Relationships: []

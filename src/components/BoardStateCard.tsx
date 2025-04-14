@@ -43,10 +43,24 @@ const BoardStateCard: React.FC<BoardStateCardProps> = ({ boardState }) => {
     }
   }, [boardState.id]);
 
+  const convertToPreviewUrl = (exportViewUrl: string): string => {
+    // Extract the ID from the export=view URL
+    const idMatch = exportViewUrl.match(/id=([^&]+)/);
+    
+    if (!idMatch || !idMatch[1]) {
+      throw new Error('Could not extract Drive ID from URL');
+    }
+    
+    const fileId = idMatch[1];
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  };
+
+  const image_prwview_url = convertToPreviewUrl(boardState.imageUrl);
+
   return (
     <Card className="overflow-hidden">
       <div className="relative aspect-[4/3] bg-gray-100">
-      <iframe src="https://drive.google.com/file/d/14hsJJjSWAXDzF8Uup_7JQz2rQRTSwPle/preview" 
+      <iframe src={image_prwview_url}
         height="100%" 
         width="100%" 
         allow="autoplay" 

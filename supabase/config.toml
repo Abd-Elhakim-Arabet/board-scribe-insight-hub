@@ -1,1 +1,5 @@
+
 project_id = "ylpomvcmsxqyniwwudav"
+
+[functions.control-eraser]
+verify_jwt = false

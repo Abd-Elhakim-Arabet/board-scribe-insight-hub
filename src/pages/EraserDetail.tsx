@@ -1,11 +1,11 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getEraserById, getBoardStatesByEraserId } from '@/services/api';
 import { Eraser, BoardState } from '@/types';
-import { ArrowLeft, Calendar,  Hash, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Hash, Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import BoardStateCard from '@/components/BoardStateCard';
+import EraserControl from '@/components/EraserControl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -125,6 +125,8 @@ const EraserDetail = () => {
           </dl>
         </div>
       </div>
+
+      <EraserControl eraserId={eraser.id} />
 
       <div className="mb-6">
         <div className="flex justify-between items-center">

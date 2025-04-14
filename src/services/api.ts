@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Eraser, BoardState } from '@/types';
 
@@ -83,5 +82,23 @@ export const getImageSummary = async (imageUrl: string): Promise<string> => {
   } catch (error) {
     console.error('Error summarizing image:', error);
     return 'Unable to generate summary';
+  }
+};
+
+// Eraser control API
+export const controlEraser = async (
+  action: string,
+  raspberryPiUrl: string = 'http://raspberrypi.local:5000'
+): Promise<{ status: string; message: string }> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('control-eraser', {
+      body: { action, raspberryPiUrl }
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error controlling eraser:', error);
+    throw new Error('Failed to control eraser. Please check Raspberry Pi connection.');
   }
 };

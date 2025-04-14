@@ -45,12 +45,13 @@ const BoardStateCard: React.FC<BoardStateCardProps> = ({ boardState }) => {
 
   return (
     <Card className="overflow-hidden">
-      <div className="relative aspect-video bg-gray-100">
-        <img
-          src={boardState.imageUrl}
-          alt={`Board state at ${formatDate(boardState.timestamp)}`}
-          className="w-full h-full object-cover"
-        />
+      <div className="relative aspect-[4/3] bg-gray-100">
+      <iframe src="https://drive.google.com/file/d/14hsJJjSWAXDzF8Uup_7JQz2rQRTSwPle/preview" 
+        height="100%" 
+        width="100%" 
+        allow="autoplay" 
+       >
+</iframe>
         <div className="absolute top-2 right-2">
           {boardState.isComplete ? (
             <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">

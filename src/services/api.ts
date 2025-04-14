@@ -12,7 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // Eraser APIs
 export const getErasers = async (): Promise<Eraser[]> => {
   const { data, error } = await supabase
-    .from('erasers')
+    .from('Eraser')
     .select('*');
   
   if (error) throw error;
@@ -21,7 +21,7 @@ export const getErasers = async (): Promise<Eraser[]> => {
 
 export const getEraserById = async (id: string): Promise<Eraser | null> => {
   const { data, error } = await supabase
-    .from('erasers')
+    .from('Eraser')
     .select('*')
     .eq('id', id)
     .single();
@@ -33,9 +33,9 @@ export const getEraserById = async (id: string): Promise<Eraser | null> => {
 // Board state APIs
 export const getBoardStatesByEraserId = async (eraserId: string): Promise<BoardState[]> => {
   const { data, error } = await supabase
-    .from('board_states')
+    .from('Board_State')
     .select('*')
-    .eq('eraserId', eraserId)
+    .eq('eraser', eraserId)
     .order('timestamp', { ascending: false });
   
   if (error) throw error;
@@ -44,7 +44,7 @@ export const getBoardStatesByEraserId = async (eraserId: string): Promise<BoardS
 
 export const getBoardStateById = async (id: string): Promise<BoardState | null> => {
   const { data, error } = await supabase
-    .from('board_states')
+    .from('Board_State')
     .select('*')
     .eq('id', id)
     .single();
@@ -55,7 +55,7 @@ export const getBoardStateById = async (id: string): Promise<BoardState | null> 
 
 export const updateBoardStateDescription = async (id: string, description: string): Promise<void> => {
   const { error } = await supabase
-    .from('board_states')
+    .from('Board_State')
     .update({ description })
     .eq('id', id);
   

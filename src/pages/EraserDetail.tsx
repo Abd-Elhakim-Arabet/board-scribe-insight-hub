@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getEraserById, getBoardStatesByEraserId } from '@/services/api';
 import { Eraser, BoardState } from '@/types';
-import { ArrowLeft, Calendar, Tool, Hash, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar,  Hash, Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import BoardStateCard from '@/components/BoardStateCard';
 import { Button } from '@/components/ui/button';
@@ -114,7 +114,6 @@ const EraserDetail = () => {
               <dt className="text-sm font-medium text-gray-500">Status</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <div className="flex items-center">
-                  <Tool className="mr-1.5 h-4 w-4 text-gray-400" />
                   {eraser.status === 'good' 
                     ? 'Good condition, operating normally' 
                     : eraser.status === 'warning'

@@ -1,9 +1,10 @@
-
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Navigate } from 'react-router-dom';
 import { Home, Clipboard, Settings, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AdminLogin } from './AdminLogin';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,16 +13,26 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const { isAdmin } = useAuth();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const navigation = [
-    { name: 'Dashboard', href: '/', icon: Home },
-    { name: 'Erasers', href: '/erasers', icon: Clipboard },
-    { name: 'Settings', href: '/settings', icon: Settings },
+  // Define navigation items
+  const navigationItems = [
+    { name: 'Dashboard', href: '/', icon: Home, requiresAdmin: true },
+    { name: 'Erasers', href: '/erasers', icon: Clipboard, requiresAdmin: false },
+    { name: 'Settings', href: '/settings', icon: Settings, requiresAdmin: true },
   ];
+
+  // Filter navigation items based on admin status
+  const navigation = navigationItems.filter(item => !item.requiresAdmin || isAdmin);
+
+  // If user is on a protected page without admin access, redirect to Erasers
+  if (!isAdmin && (location.pathname === '/' || location.pathname === '/settings')) {
+    return <Navigate to="/erasers" />;
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -50,6 +61,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </Link>
           ))}
         </nav>
+        
+        {/* Admin Login Section */}
+        <AdminLogin />
       </div>
 
       {/* Main content */}

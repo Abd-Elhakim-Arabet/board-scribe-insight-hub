@@ -1,15 +1,26 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { AdminRegistration } from '@/components/AdminRegistration';
 
 const Settings = () => {
+  const { isAdmin, isSuper } = useAuth();
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold mb-6">Settings</h1>
+      
+      {/* Admin Registration - Only shown to super admins */}
+      {isAdmin && isSuper && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Administrator Management</h2>
+          <AdminRegistration />
+        </div>
+      )}
       
       <Card>
         <CardHeader>

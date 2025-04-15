@@ -15,16 +15,17 @@ interface EraserControlProps {
 
 const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [raspberryPiUrl, setRaspberryPiUrl] = useState('http://raspberrypi.local:5000');
+  const [raspberryPiUrl, setRaspberryPiUrl] = useState('http://raspberrypi.local:3000');
   const [showSettings, setShowSettings] = useState(false);
   const [isOn, setIsOn] = useState(false);
   const { toast } = useToast();
 
   const handleToggle = async (turnOn: boolean) => {
     const action = turnOn ? 'on' : 'off';
+    if (!action) return;
     setIsLoading(true);
     try {
-      await controlEraser(action, raspberryPiUrl);
+      await controlEraser();
       setIsOn(turnOn);
       toast({
         title: "Success",

@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Eraser, BoardState } from '@/types';
 
@@ -62,6 +61,25 @@ export const updateBoardStateDescription = async (id: string, description: strin
   if (error) throw error;
 };
 
+export const updateBoardStateTableContent = async (id: string, tableContent: string): Promise<void> => {
+  const { error } = await supabase
+    .from('Board_State')
+    .update({ tableContent })
+    .eq('id', id);
+  
+  if (error) throw error;
+};
+
+// New function to update board state labels
+export const updateBoardStateLabels = async (id: string, labels: string[]): Promise<void> => {
+  const { error } = await supabase
+    .from('Board_State')
+    .update({ labels })
+    .eq('id', id);
+  
+  if (error) throw error;
+};
+
 // Function to call Python API for image summarization
 export const getImageSummary = async (imageUrl: string): Promise<string> => {
   try {
@@ -84,6 +102,66 @@ export const getImageSummary = async (imageUrl: string): Promise<string> => {
   } catch (error) {
     console.error('Error summarizing image:', error);
     return 'Unable to generate summary';
+  }
+};
+
+// Function to call Python API for table extraction
+export const extractTableContent = async (imageUrl: string): Promise<string> => {
+  try {
+    
+    const response = await fetch('http://127.0.0.1:5000/api/extract-table', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imageUrl }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to extract table content');
+    }
+    
+    const data = await response.json();
+    return data.tableContent;
+    
+  } catch (error) {
+    console.error('Error extracting table content:', error);
+    return 'Unable to extract table content';
+  }
+};
+
+export const availableLabels = [
+  "Computer and Network Security",
+  "Machine Learning",
+  "Group Project",
+  "Numerical Methods and Optimisation",
+  "Advanced Databases",
+  "Time Series Analysis and Classification",
+  "Project Management"
+];
+
+export const classifyContent = async (content: string): Promise<string[]> => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/classify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        content,
+        availableLabels 
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to classify content');
+    }
+    
+    const data = await response.json();
+    return data.labels || [];
+  } catch (error) {
+    console.error('Error classifying content:', error);
+    return [];
   }
 };
 

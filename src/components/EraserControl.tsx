@@ -22,10 +22,11 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
 
   const handleToggle = async (turnOn: boolean) => {
     const action = turnOn ? 'on' : 'off';
-    if (!action) return;
+    
     setIsLoading(true);
     try {
-      await controlEraser();
+      if (turnOn){
+      await controlEraser();}
       setIsOn(turnOn);
       toast({
         title: "Success",

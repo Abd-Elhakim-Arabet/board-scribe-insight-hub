@@ -1,4 +1,3 @@
-
 export type EraserStatus = 'good' | 'warning' | 'error';
 
 export interface Eraser {
@@ -17,5 +16,7 @@ export interface BoardState {
   imageUrl: string;
   timestamp: string;
   description?: string;
+  tableContent?: string;
+  labels?: string[];
   isComplete: boolean;
 }

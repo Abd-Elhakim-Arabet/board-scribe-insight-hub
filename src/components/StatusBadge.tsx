@@ -2,17 +2,23 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import mqtt from 'mqtt';
 
-const StatusBadge: React.FC = () => {
+interface StatusBadgeProps {
+  id: string;
+}
+
+
+
+const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
   const [status, setStatus] = useState('offline');
   const clientRef = useRef(null);
 
   const handleMessage = useCallback((topic: string, message: Buffer) => {
-    if (topic === 'eraser_1/status') {
+    if (topic === `eraser_${id}/status`) {
       const statusMessage = message.toString();
       setStatus(statusMessage.toLowerCase());
       console.log('Received status message:', statusMessage);
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     console.log('Setting up MQTT subscription');

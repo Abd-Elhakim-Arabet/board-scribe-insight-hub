@@ -74,7 +74,7 @@ const Erasers = () => {
                         <p className="text-lg font-medium text-blue-600 mr-2">
                           {eraser.name}
                         </p>
-                        <StatusBadge status={eraser.status} />
+                        <StatusBadge id={eraser.id} />
                       </div>
                       <div className="text-sm text-gray-500">
                         Room: <span className="font-medium">{eraser.room}</span>

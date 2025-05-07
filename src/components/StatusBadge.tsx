@@ -36,11 +36,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
 
     client.on('connect', () => {
       console.log('Connected to MQTT broker');
-      client.subscribe('eraser_1/status', (err) => {
+      client.subscribe(`eraser_${id}/status`, (err) => {
         if (err) {
           console.error('Subscription error:', err);
         } else {
-          console.log('Subscribed to topic: eraser_1/status');
+          console.log(`Subscribed to topic: eraser_${id}/status`);
         }
       });
     });
@@ -66,7 +66,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
       console.log('Cleaning up MQTT subscription');
       if (client) {
         client.off('message', handleMessage);
-        client.unsubscribe('eraser_1/status');
+        client.unsubscribe(`eraser_${id}/status`);
         client.end(true); // Force disconnect
       }
     };

@@ -82,7 +82,7 @@ const EraserDetail = () => {
               Details and board history
             </p>
           </div>
-          <StatusBadge status={eraser.status} className="px-3 py-1 text-sm" />
+          <StatusBadge id={eraser.id} />
         </div>
         <div className="border-t border-gray-200">
           <dl>

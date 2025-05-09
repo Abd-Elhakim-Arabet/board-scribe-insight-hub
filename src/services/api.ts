@@ -84,7 +84,7 @@ export const updateBoardStateLabels = async (id: string, labels: string[]): Prom
 export const getImageSummary = async (imageUrl: string): Promise<string> => {
   try {
     
-    const response = await fetch('ai-summary-chi.vercel.app/api/summarize', {
+    const response = await fetch('https://ai-summary-chi.vercel.app/api/summarize', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export const getImageSummary = async (imageUrl: string): Promise<string> => {
 export const extractTableContent = async (imageUrl: string): Promise<string> => {
   try {
     
-    const response = await fetch('ai-summary-chi.vercel.app/api/extract-table', {
+    const response = await fetch('https://ai-summary-chi.vercel.app/api/extract-table', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export const availableLabels = [
 
 export const classifyContent = async (content: string): Promise<string[]> => {
   try {
-    const response = await fetch('ai-summary-chi.vercel.app/api/classify', {
+    const response = await fetch('https://ai-summary-chi.vercel.app/api/classify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

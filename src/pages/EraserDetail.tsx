@@ -9,6 +9,7 @@ import EraserControl from '@/components/EraserControl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+
 const EraserDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [eraser, setEraser] = useState<Eraser | null>(null);
@@ -148,7 +149,7 @@ const EraserDetail = () => {
           ))}
         </div>
       )}
-    </div>
+  </div>
   );
 };
 

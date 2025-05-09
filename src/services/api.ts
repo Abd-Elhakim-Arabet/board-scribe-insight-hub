@@ -84,7 +84,7 @@ export const updateBoardStateLabels = async (id: string, labels: string[]): Prom
 export const getImageSummary = async (imageUrl: string): Promise<string> => {
   try {
     
-    const response = await fetch('http://127.0.0.1:5000/api/summarize', {
+    const response = await fetch('ai-summary-chi.vercel.app/api/summarize', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ export const getImageSummary = async (imageUrl: string): Promise<string> => {
 export const extractTableContent = async (imageUrl: string): Promise<string> => {
   try {
     
-    const response = await fetch('http://127.0.0.1:5000/api/extract-table', {
+    const response = await fetch('ai-summary-chi.vercel.app/api/extract-table', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export const availableLabels = [
 
 export const classifyContent = async (content: string): Promise<string[]> => {
   try {
-    const response = await fetch('http://127.0.0.1:5000/api/classify', {
+    const response = await fetch('ai-summary-chi.vercel.app/api/classify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -162,16 +162,5 @@ export const classifyContent = async (content: string): Promise<string[]> => {
   } catch (error) {
     console.error('Error classifying content:', error);
     return [];
-  }
-};
-
-import axios from 'axios';
-
-export const controlEraser = async (): Promise<void> => {
-  try {
-    await axios.get('http://localhost:3000/runMotor');
-    console.log('Motor run command sent successfully');
-  } catch (error) {
-    console.error('Failed to run motor:', error);
   }
 };

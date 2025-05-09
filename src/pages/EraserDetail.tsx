@@ -9,6 +9,7 @@ import EraserControl from '@/components/EraserControl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+
 const EraserDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [eraser, setEraser] = useState<Eraser | null>(null);
@@ -82,7 +83,7 @@ const EraserDetail = () => {
               Details and board history
             </p>
           </div>
-          <StatusBadge status={eraser.status} className="px-3 py-1 text-sm" />
+          <StatusBadge id={eraser.id} />
         </div>
         <div className="border-t border-gray-200">
           <dl>
@@ -148,7 +149,7 @@ const EraserDetail = () => {
           ))}
         </div>
       )}
-    </div>
+  </div>
   );
 };
 

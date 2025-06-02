@@ -164,3 +164,22 @@ export const classifyContent = async (content: string): Promise<string[]> => {
     return [];
   }
 };
+
+// Get last 500 logs for an eraser
+export interface EraserLog {
+  id: number;
+  eraserId: number;
+  timestamp: string;
+  message: string;
+}
+
+export const getEraserLogs = async (eraserId: string): Promise<EraserLog[]> => {
+  const { data, error } = await supabase
+    .from('EraserLogs')
+    .select('*')
+    .eq('eraserId', eraserId)
+    .order('timestamp', { ascending: false })
+    .limit(500);
+  if (error) throw error;
+  return data || [];
+};

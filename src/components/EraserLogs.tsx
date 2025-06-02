@@ -1,68 +1,98 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mqtt from 'mqtt';
+import React, { useEffect, useState, useRef } from 'react';
+import { getEraserLogs, EraserLog, supabase } from '@/services/api';
 
 interface EraserLogsProps {
   eraserId: string;
 }
 
-const MQTT_URL = 'wss://1c1ede3b166543d4823c1c3f26a82bad.s1.eu.hivemq.cloud:8884/mqtt';
-const MQTT_OPTIONS = {
-  clientId: `mqttjs_logs_${Math.random().toString(16).substr(2, 8)}`,
-  username: 'board',
-  password: 'Board1234',
-  reconnectPeriod: 5000,
-  keepalive: 60,
-};
-
 const EraserLogs: React.FC<EraserLogsProps> = ({ eraserId }) => {
-  const [logs, setLogs] = useState('');
-  const [connected, setConnected] = useState(false);
-  const clientRef = useRef<mqtt.MqttClient | null>(null);
+  const [logs, setLogs] = useState<EraserLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const logsEndRef = useRef<HTMLPreElement | null>(null);
 
   useEffect(() => {
-    const client = mqtt.connect(MQTT_URL, MQTT_OPTIONS);
-    clientRef.current = client;
+    setLoading(true);
+    getEraserLogs(eraserId)
+      .then((data) => {
+        setLogs(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError('Failed to load logs');
+        setLogs([]);
+      })
+      .finally(() => setLoading(false));
 
-    client.on('connect', () => {
-      setConnected(true);
-      client.subscribe(`eraser_${eraserId}/logs`, (err) => {
-        if (err) {
-          setLogs('Failed to subscribe to logs topic.');
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('eraser-logs-listen')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT', // Listen only for new logs
+          schema: 'public',
+          table: 'EraserLogs',
+          filter: `eraserId=eq.${eraserId}`,
+        },
+        (payload) => {
+          console.log('Realtime payload:', payload);
+          getEraserLogs(eraserId).then(setLogs);
         }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'EraserLogs',
+          filter: `eraserId=eq.${eraserId}`,
+        },
+        (payload) => {
+          console.log('Realtime DELETE payload:', payload);
+          getEraserLogs(eraserId).then(setLogs);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'EraserLogs',
+          filter: `eraserId=eq.${eraserId}`,
+        },
+        (payload) => {
+          console.log('Realtime UPDATE payload:', payload);
+          getEraserLogs(eraserId).then(setLogs);
+        }
+      )
+      .subscribe((status) => {
+        console.log('Supabase channel status:', status);
       });
-    });
 
-    client.on('message', (topic, message) => {
-      if (topic === `eraser_${eraserId}/logs`) {
-        setLogs(message.toString());
-      }
-    });
-
-    client.on('error', (err) => {
-      setLogs('MQTT connection error.');
-      setConnected(false);
-    });
-
-    client.on('offline', () => {
-      setConnected(false);
-    });
-
-    // Cleanup
     return () => {
-      if (client) {
-        client.unsubscribe(`eraser_${eraserId}/logs`);
-        client.end(true);
-      }
+      channel.unsubscribe();
     };
   }, [eraserId]);
+
+  // Scroll to bottom when logs change
+  useEffect(() => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollTop = logsEndRef.current.scrollHeight;
+    }
+  }, [logs]);
 
   return (
     <div className="flex flex-col h-96">
       <div className="mb-2 text-sm text-gray-500">
-        {connected ? 'Live logs (auto-updating)' : 'Connecting to MQTT...'}
+        {loading ? 'Loading logs...' : error ? error : `Last ${logs.length} logs (most recent first)`}
       </div>
-      <pre className="flex-1 bg-black text-green-200 rounded p-3 overflow-auto text-xs whitespace-pre-wrap">
-        {logs || 'No logs received yet.'}
+      <pre
+        ref={logsEndRef}
+        className="flex-1 bg-black text-green-200 rounded p-3 overflow-auto text-xs whitespace-pre-wrap"
+      >
+        {logs.length === 0 && !loading ? 'No logs found.' :
+          logs.slice().reverse().map(log => `${new Date(log.timestamp).toLocaleString()} | ${log.message}`).join('\n')}
       </pre>
     </div>
   );

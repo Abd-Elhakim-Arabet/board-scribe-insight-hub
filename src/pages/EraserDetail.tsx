@@ -20,7 +20,7 @@ const EraserDetail = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Filter state
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({ from: undefined, to: undefined });
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to?: Date } | undefined>(undefined);
   const [labelFilter, setLabelFilter] = useState<string[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -58,7 +58,7 @@ const EraserDetail = () => {
   const filteredBoardStates = boardStates.filter((state) => {
     // Date filter
     const stateDate = new Date(state.timestamp);
-    const inDateRange = (!dateRange.from || stateDate >= dateRange.from) && (!dateRange.to || stateDate <= dateRange.to);
+    const inDateRange = !dateRange?.from || (stateDate >= dateRange.from && (!dateRange.to || stateDate <= dateRange.to));
     // Label filter
     const hasLabels = labelFilter.length === 0 || (state.labels && labelFilter.every(l => state.labels.includes(l)));
     return inDateRange && hasLabels;
@@ -188,7 +188,7 @@ const EraserDetail = () => {
                   ))}
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full" onClick={() => { setDateRange({ from: undefined, to: undefined }); setLabelFilter([]); }}>Clear Filters</Button>
+              <Button variant="outline" size="sm" className="w-full" onClick={() => { setDateRange(undefined); setLabelFilter([]); }}>Clear Filters</Button>
             </aside>
             {/* Board State List */}
             <main className="flex-1">

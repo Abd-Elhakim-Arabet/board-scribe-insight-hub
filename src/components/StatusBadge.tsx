@@ -10,6 +10,7 @@ interface StatusBadgeProps {
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
   const [status, setStatus] = useState('offline');
+  const [session, setSession] = useState('not active');
   const clientRef = useRef(null);
 
   const handleMessage = useCallback((topic: string, message: Buffer) => {
@@ -17,6 +18,12 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
       const statusMessage = message.toString();
       setStatus(statusMessage.toLowerCase());
       console.log('Received status message:', statusMessage);
+    }
+
+    if (topic === `eraser_${id}/session`) {
+      const sessionMessage = message.toString();
+      setSession(sessionMessage.toLowerCase());
+      console.log('Received session message:', sessionMessage);
     }
   }, [id]);
 
@@ -43,6 +50,13 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
           console.log(`Subscribed to topic: eraser_${id}/status`);
         }
       });
+      client.subscribe(`eraser_${id}/session`, (err) => {
+        if (err) {
+          console.error('Subscription error:', err);
+        } else {
+          console.log(`Subscribed to topic: eraser_${id}/session`);
+        }
+      });
     });
 
     client.on('error', (err) => {
@@ -67,6 +81,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
       if (client) {
         client.off('message', handleMessage);
         client.unsubscribe(`eraser_${id}/status`);
+        client.unsubscribe(`eraser_${id}/session`);
         client.end(true); // Force disconnect
       }
     };
@@ -82,19 +97,43 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ id }) => {
       text: 'Offline',
     },
   };
-
   const config = statusConfig[status] || statusConfig.offline;
+  const sessionConfig = {
+    'not active': {
+      color: 'bg-gray-500',
+      text: 'Not Active',
+    },
+    'active': {
+      color: 'bg-blue-500',
+      text: 'Active',
+    },
+  };
+  let sessionf = sessionConfig['not active'];
+  if (status === 'online') {
+    sessionf = sessionConfig[session] || sessionConfig['not active'];
+  }
 
   return (
-    <span
+    <div className="flex flex-row items-center space-x-2">
+      <span
       className={cn(
         'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium text-white',
         config.color
       )}
-    >
+      >
       <span className="mr-1 h-1.5 w-1.5 rounded-full bg-white animate-pulse-slow"></span>
       {config.text}
-    </span>
+      </span>
+      <span
+        className={cn(
+          'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium text-white',
+          sessionf.color
+        )}
+      >
+        <span className="mr-1 h-1.5 w-1.5 rounded-full bg-white animate-pulse-slow"></span>
+        {sessionf.text}
+      </span>
+    </div>
   );
 };
 

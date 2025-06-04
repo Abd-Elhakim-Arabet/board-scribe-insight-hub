@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Camera, Eraser, Power, RefreshCw, Settings } from 'lucide-react';
+import { Camera, Eraser, Power, RefreshCw, Settings, Zap } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
 import mqtt from 'mqtt';
@@ -15,6 +15,7 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [deviceStatus, setDeviceStatus] = useState('offline');
+  const [sessionStatus, setSessionStatus] = useState('not active');
   const clientRef = useRef(null);
   const { toast } = useToast();
 
@@ -26,6 +27,12 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
     if (topic === `eraser_${eraserId}/status`) {
       setDeviceStatus(messageStr.toLowerCase());
       console.log('Received status message:', messageStr);
+    }
+    
+    // Handle session status updates
+    if (topic === `eraser_${eraserId}/session`) {
+      setSessionStatus(messageStr.toLowerCase());
+      console.log('Received session message:', messageStr);
     }
     
     // Handle command responses
@@ -64,8 +71,12 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
 
     client.on('connect', () => {
       console.log('Connected to MQTT broker for eraser control');
-      // Subscribe to status and response topics
-      client.subscribe([`eraser_${eraserId}/status`, `eraser_${eraserId}/response`], (err) => {
+      // Subscribe to status, session and response topics
+      client.subscribe([
+        `eraser_${eraserId}/status`, 
+        `eraser_${eraserId}/session`, 
+        `eraser_${eraserId}/response`
+      ], (err) => {
         if (err) {
           console.error('Subscription error:', err);
         } else {
@@ -91,7 +102,11 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
       console.log('Cleaning up MQTT connection');
       if (client) {
         client.off('message', handleMessage);
-        client.unsubscribe([`eraser_${eraserId}/status`, `eraser_${eraserId}/response`]);
+        client.unsubscribe([
+          `eraser_${eraserId}/status`, 
+          `eraser_${eraserId}/session`, 
+          `eraser_${eraserId}/response`
+        ]);
         client.end(true);
       }
     };
@@ -127,8 +142,10 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
   const handleCapture = () => sendCommand('capture');
   const handleErase = () => sendCommand('erase');
   const handleCaptureAndErase = () => sendCommand('capture_erase');
+  const handleToggleSession = () => sendCommand('session');
 
   const isOnline = deviceStatus === 'online';
+  const isSessionActive = sessionStatus === 'active';
 
   return (
     <Card className="mb-6">
@@ -148,9 +165,16 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
             <p className="mt-2 text-lg font-medium">
               {isOnline ? 'Device Online' : 'Device Offline'}
             </p>
+            
+            {isOnline && (
+              <div className="mt-2 flex items-center gap-2">
+                <div className={`h-3 w-3 rounded-full ${isSessionActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                <span className="text-sm">{isSessionActive ? 'Session Active' : 'Session Inactive'}</span>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-4">
             <Button
               variant="outline"
               onClick={handleCapture}
@@ -181,6 +205,16 @@ const EraserControl: React.FC<EraserControlProps> = ({ eraserId }) => {
               Capture & Erase
             </Button>
           </div>
+
+          <Button
+            variant={isSessionActive ? "default" : "outline"}
+            onClick={handleToggleSession}
+            disabled={isLoading || !isOnline}
+            className={`flex items-center justify-center w-full ${isSessionActive ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+          >
+            <Zap className="mr-2 h-4 w-4" />
+            {isSessionActive ? 'End Session' : 'Start Session'}
+          </Button>
 
           {isLoading && (
             <div className="mt-4 text-sm text-gray-500">

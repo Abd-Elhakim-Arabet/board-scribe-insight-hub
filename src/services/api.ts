@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Eraser, BoardState } from '@/types';
+import { Eraser, BoardState, Session } from '@/types';
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -180,6 +180,38 @@ export const getEraserLogs = async (eraserId: string): Promise<EraserLog[]> => {
     .eq('eraserId', eraserId)
     .order('timestamp', { ascending: false })
     .limit(500);
+  if (error) throw error;
+  return data || [];
+};
+
+// Session APIs
+export const getSessions = async (): Promise<Session[]> => {
+  const { data, error } = await supabase
+    .from('Session')
+    .select('*')
+    .order('started_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const getBoardStatesBySessionId = async (sessionId: number): Promise<BoardState[]> => {
+  const { data, error } = await supabase
+    .from('Board_State')
+    .select('*')
+    .eq('session', sessionId)
+    .order('timestamp', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const getSessionChildren = async (sessionId: number): Promise<any[]> => {
+  const { data, error } = await supabase
+    .from('session_state')
+    .select('*')
+    .eq('session', sessionId);
+
   if (error) throw error;
   return data || [];
 };

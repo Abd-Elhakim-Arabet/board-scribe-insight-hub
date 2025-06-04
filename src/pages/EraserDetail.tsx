@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getEraserById, getBoardStatesByEraserId, availableLabels } from '@/services/api';
-import { Eraser, BoardState } from '@/types';
+import { getEraserById, getBoardStatesByEraserId, availableLabels, getSessions, getSessionChildren, getBoardStateById } from '@/services/api';
+import { Eraser, BoardState, Session } from '@/types';
 import { ArrowLeft, Calendar, Hash, Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import BoardStateCard from '@/components/BoardStateCard';
@@ -11,18 +11,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import EraserLogs from '@/components/EraserLogs';
 import { Calendar as DateRangeCalendar } from '@/components/ui/calendar';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
 const EraserDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [eraser, setEraser] = useState<Eraser | null>(null);
   const [boardStates, setBoardStates] = useState<BoardState[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessionChildren, setSessionChildren] = useState<Record<number, any[]>>({}); // New state for session children
+  const [boardStateDetails, setBoardStateDetails] = useState<Record<number, BoardState>>({}); // New state for board state details
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Filter state
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to?: Date } | undefined>(undefined);
   const [labelFilter, setLabelFilter] = useState<string[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null); // Changed type to string
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,20 +55,78 @@ const EraserDetail = () => {
     fetchData();
   }, [id]);
 
-  const formatDate = (dateString: string) => {
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const data = await getSessions();
+        setSessions(data);
+      } catch (err) {
+        console.error('Error fetching sessions:', err);
+      }
+    };
+
+    fetchSessions();
+  }, []);
+
+  useEffect(() => {
+    const fetchSessionChildren = async () => {
+      try {
+        const childrenPromises = sessions.map(session => getSessionChildren(session.id));
+        const childrenData = await Promise.all(childrenPromises);
+        const sessionChildrenMap = sessions.reduce((acc, session, index) => {
+          acc[session.id] = childrenData[index];
+          return acc;
+        }, {} as Record<number, any[]>);
+        setSessionChildren(sessionChildrenMap);
+      } catch (err) {
+        console.error('Error fetching session children:', err);
+      }
+    };
+
+    fetchSessionChildren();
+  }, [sessions]);
+
+  useEffect(() => {
+    const fetchBoardStateDetails = async () => {
+        try {
+            console.log('Fetching board state details for session children:', sessionChildren);
+            const boardStatePromises = Object.keys(sessionChildren).flatMap(sessionId => 
+                sessionChildren[sessionId].map(child => getBoardStateById(child.state))
+            );
+            const boardStateData = await Promise.all(boardStatePromises);
+            console.log('Fetched board state data:', boardStateData);
+            const boardStateDetailsMap = boardStateData.reduce((acc, boardState) => {
+                if (boardState) acc[boardState.id] = boardState;
+                return acc;
+            }, {});
+            setBoardStateDetails(boardStateDetailsMap);
+          } catch (err) {
+            console.error('Error fetching board state details:', err);
+        }
+    };
+
+    if (Object.keys(sessionChildren).length > 0) {
+        fetchBoardStateDetails();
+    }
+}, [sessionChildren]);
+
+  const formatDate = (dateString: string, asTime: boolean = false) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString();
+    return asTime ? date.toLocaleTimeString() : date.toLocaleDateString();
   };
 
-  // Filtering logic
   const filteredBoardStates = boardStates.filter((state) => {
-    // Date filter
     const stateDate = new Date(state.timestamp);
     const inDateRange = !dateRange?.from || (stateDate >= dateRange.from && (!dateRange.to || stateDate <= dateRange.to));
-    // Label filter
     const hasLabels = labelFilter.length === 0 || (state.labels && labelFilter.every(l => state.labels.includes(l)));
     return inDateRange && hasLabels;
   });
+
+  const filteredBoardStatesBySession = (sessionId: number) => {
+    return filteredBoardStates.filter((state) => state.session === sessionId);
+  };
+
+  const filteredSessions = sessions.filter(session => session.ended_at); // Filter sessions with a set enddate
 
   if (isLoading) {
     return (
@@ -190,38 +254,89 @@ const EraserDetail = () => {
               </div>
               <Button variant="outline" size="sm" className="w-full" onClick={() => { setDateRange(undefined); setLabelFilter([]); }}>Clear Filters</Button>
             </aside>
-            {/* Board State List */}
+            {/* Session List */}
             <main className="flex-1">
-              {filteredBoardStates.length === 0 ? (
+              {filteredSessions.length === 0 ? (
                 <Card className="bg-gray-50 border-dashed">
                   <CardContent className="p-8 text-center">
-                    <p className="text-gray-500">No board states match the selected filters.</p>
+                    <p className="text-gray-500">No sessions available.</p>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="flex flex-col gap-3">
-                  {filteredBoardStates.map((boardState) => (
-                    <div key={boardState.id} className="border rounded shadow-sm bg-white">
-                      <button
-                        className="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-gray-50 focus:outline-none"
-                        onClick={() => setExpandedId(expandedId === boardState.id ? null : boardState.id)}
-                      >
-                        <span className="font-medium text-sm flex-1 text-left">{formatDate(boardState.timestamp)}</span>
-                        <span className="flex gap-1 ml-2">
-                          {(boardState.labels || []).map(label => (
-                            <span key={label} className="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs">{label}</span>
-                          ))}
+                <Accordion type="single" collapsible>
+                  {filteredSessions.map((session) => (
+                    <AccordionItem key={session.id} value={session.id.toString()}>
+                      <AccordionTrigger>
+                        <span className="font-medium text-sm flex-1 text-left">
+                          {formatDate(session.started_at)}
                         </span>
-                        <span className="ml-4 text-xs text-gray-400">{expandedId === boardState.id ? '▲' : '▼'}</span>
-                      </button>
-                      {expandedId === boardState.id && (
-                        <div className="p-4 border-t bg-gray-50">
-                          <BoardStateCard boardState={boardState} />
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="prose max-w-none">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({ node, ...props }) => <h1 className="text-2xl font-bold" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="text-xl font-semibold" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="text-lg font-medium" {...props} />,
+                              p: ({ node, ...props }) => <p className="text-sm text-gray-700 leading-relaxed" {...props} />,
+                              ul: ({ node, ...props }) => <ul className="list-disc list-inside" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="list-decimal list-inside" {...props} />,
+                              li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                              a: ({ node, ...props }) => <a className="text-blue-600 hover:underline" {...props} />,
+                              code: ({ node, ...props }) => <code className="bg-gray-100 text-red-600 px-1 py-0.5 rounded" {...props} />,
+                            }}
+                          >
+                            {session.summary || 'No description available'}
+                          </ReactMarkdown>
                         </div>
-                      )}
-                    </div>
+                        <Accordion type="single" collapsible>
+                          {sessionChildren[session.id]?.map((child) => (
+                            <AccordionItem key={child.id} value={child.id.toString()}>
+                              {/* {(() => {
+                                const boardState = filteredBoardStatesBySession(session.id).find(state => state.id === child.state);
+                                if (!boardState) return null;
+                                return (
+                                  <>
+                                  <AccordionTrigger className="flex items-center justify-between">
+                                    {formatDate(boardState.timestamp)}
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    {boardStateDetails[child.id] ? (
+                                      <BoardStateCard boardState={boardStateDetails[child.id]} />
+                                    ) : (
+                                      <p>Loading details...</p>
+                                    )}
+                                  </AccordionContent>
+                                  </>
+                                );
+                              })()} */}
+                              <AccordionTrigger>
+                                <span className="font-medium text-sm flex-1 text-left">
+                                  {boardStateDetails[child.state] ? formatDate(boardStateDetails[child.state].timestamp, true) : 'Loading...'}
+                                </span>
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                {(() => {
+                                  const boardState = boardStateDetails[child.state];
+                                  if (!boardState) return <p>No board state found for this session.</p>;
+                                  return (
+                                    <BoardStateCard boardState={boardState} />
+                                  );
+                                })()}
+                                {/* {boardStateDetails[child.id] ? (
+                                  <BoardStateCard boardState={boardStateDetails[child.id]} />
+                                ) : (
+                                  <p>Loading details...</p>
+                                )} */}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
                   ))}
-                </div>
+                </Accordion>
               )}
             </main>
           </div>

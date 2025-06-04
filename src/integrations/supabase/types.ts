@@ -122,7 +122,7 @@ export type Tables<
   }
     ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
   ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -215,6 +215,25 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export type Session = {
+  id: number
+  eraser: number | null
+  started_at: string
+  ended_at: string | null
+  summary: string | null
+}
+
+export type Board_State = {
+  id: number
+  timestamp: string
+  imageUrl: string | null
+  isComplete: boolean | null
+  eraser: number | null
+  description: string | null
+  tableContent: string | null
+  labels: string[] | null
+}
 
 export const Constants = {
   public: {

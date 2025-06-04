@@ -10,9 +10,10 @@ import LabelManager from './labels/LabelManager';
 
 interface BoardStateCardProps {
   boardState: BoardState;
+  sessionSummary?: string;
 }
 
-const BoardStateCard: React.FC<BoardStateCardProps> = ({ boardState }) => {
+const BoardStateCard: React.FC<BoardStateCardProps> = ({ boardState, sessionSummary }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingTable, setIsLoadingTable] = useState(false);
   const [summary, setSummary] = useState(boardState.description || '');
@@ -130,6 +131,11 @@ const BoardStateCard: React.FC<BoardStateCardProps> = ({ boardState }) => {
         </div>
         <div className="flex-1 min-w-0">
           <CardContent className="pt-0 pb-2">
+            {sessionSummary && (
+              <div className="mb-4 text-gray-600">
+                <strong>Session Summary:</strong> {sessionSummary}
+              </div>
+            )}
             <div className="text-sm text-gray-500 mb-2 flex items-center">
               <ClockIcon className="h-3.5 w-3.5 mr-1" />
               {formatDate(boardState.timestamp)}

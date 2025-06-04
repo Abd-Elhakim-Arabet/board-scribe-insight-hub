@@ -10,13 +10,22 @@ export interface Eraser {
   lastActive?: string;
 }
 
-export interface BoardState {
+export type BoardState = {
   id: string;
-  eraserId: string;
-  imageUrl: string;
   timestamp: string;
-  description?: string;
-  tableContent?: string;
-  labels?: string[];
-  isComplete: boolean;
-}
+  imageUrl: string | null;
+  isComplete: boolean | null;
+  eraser: number | null;
+  description: string | null;
+  tableContent: string | null;
+  labels: string[] | null;
+  session: number | null; // Added session property
+};
+
+export type Session = {
+  id: number;
+  eraser: number | null;
+  started_at: string;
+  ended_at: string | null;
+  summary: string | null;
+};

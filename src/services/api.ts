@@ -215,3 +215,69 @@ export const getSessionChildren = async (sessionId: number): Promise<any[]> => {
   if (error) throw error;
   return data || [];
 };
+
+// Scheduling APIs
+export interface ScheduleTask {
+  id?: number;
+  eraserId: string;
+  tasktype: 'capture' | 'erase' | 'capture_erase';
+  scheduletype: 'time' | 'interval' | 'weekly';
+  schedulevalue: string;
+  intervalunit?: 'minutes' | 'hours' | 'days';
+  isactive: boolean;
+  description?: string;
+  createdat?: string;
+  lastRun?: string;
+  nextrun?: string;
+}
+
+export const getSchedulesByEraserId = async (eraserId: string): Promise<ScheduleTask[]> => {
+  const { data, error } = await supabase
+    .from('eraser_schedules')
+    .select('*')
+    .eq('eraserId', eraserId)
+    .order('createdat', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const createScheduleTask = async (schedule: Omit<ScheduleTask, 'id'>): Promise<ScheduleTask> => {
+  const { data, error } = await supabase
+    .from('eraser_schedules')
+    .insert([schedule])
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const updateScheduleTask = async (id: number, updates: Partial<ScheduleTask>): Promise<void> => {
+  const { error } = await supabase
+    .from('eraser_schedules')
+    .update(updates)
+    .eq('id', id);
+
+  if (error) throw error;
+};
+
+export const deleteScheduleTask = async (id: number): Promise<void> => {
+  const { error } = await supabase
+    .from('eraser_schedules')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+};
+
+export const getAllActiveSchedules = async (): Promise<ScheduleTask[]> => {
+  const { data, error } = await supabase
+    .from('eraser_schedules')
+    .select('*')
+    .eq('isactive', true)
+    .order('nextrun', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+};

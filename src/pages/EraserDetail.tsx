@@ -6,6 +6,7 @@ import { ArrowLeft, Calendar, Hash, Loader2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import BoardStateCard from '@/components/BoardStateCard';
 import EraserControl from '@/components/EraserControl';
+import EraserScheduler from '@/components/EraserScheduler';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -154,12 +155,11 @@ const EraserDetail = () => {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to erasers
         </Link>
-      </div>
-
-      <Tabs defaultValue="details">
+      </div>      <Tabs defaultValue="details">
         <TabsList className="mb-4">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="control">Control</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="history">Board History</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
@@ -214,10 +214,12 @@ const EraserDetail = () => {
                 </div>
               </dl>
             </div>
-          </div>
-        </TabsContent>
+          </div>        </TabsContent>
         <TabsContent value="control">
           <EraserControl eraserId={eraser.id} />
+        </TabsContent>
+        <TabsContent value="schedule">
+          <EraserScheduler eraserId={eraser.id} />
         </TabsContent>
         <TabsContent value="history">
           <div className="flex flex-col md:flex-row gap-6">

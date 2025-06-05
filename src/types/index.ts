@@ -29,3 +29,17 @@ export type Session = {
   ended_at: string | null;
   summary: string | null;
 };
+
+export interface ScheduleTask {
+  id?: number;
+  eraserid: string;
+  tasktype: 'capture' | 'erase' | 'capture_erase';
+  scheduletype: 'time' | 'interval' | 'weekly';
+  schedulevalue: string;
+  intervalunit?: 'minutes' | 'hours' | 'days';
+  isactive: boolean;
+  description?: string;
+  createdat?: string;
+  lastRun?: string;
+  nextrun?: string;
+}

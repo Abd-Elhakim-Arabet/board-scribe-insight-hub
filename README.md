@@ -11,6 +11,10 @@ https://github.com/user-attachments/assets/bb0e6e26-4ece-4036-a980-e65c54e2440b
 
 
 
+## AI services
+
+github repo of ai services endpoints from [here](https://github.com/MHND09/Ai-summary) and documentation [https://ai-summary-chi.vercel.app](https://ai-summary-chi.vercel.app/)
+
 ## 🛠️ Tech Stack
 
 - [Vite.js](https://vitejs.dev/) – Fast development build tool
@@ -30,6 +34,7 @@ Make sure you have the following installed:
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
 ---
+* .env was uploaded intentionally 
 
 ### 📦 Installation
 

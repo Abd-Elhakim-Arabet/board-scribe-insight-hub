@@ -4,6 +4,7 @@ This is the frontend web application for the Smart Whiteboard System, built usin
 
 ## Demo
 
+You can visit demo [here](https://smart-eraser.vercel.app/)
 
 
 https://github.com/user-attachments/assets/bb0e6e26-4ece-4036-a980-e65c54e2440b

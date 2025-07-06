@@ -2,6 +2,14 @@
 
 This is the frontend web application for the Smart Whiteboard System, built using **Vite.js** with **React** and **Tailwind CSS**.
 
+## Demo
+
+
+
+https://github.com/user-attachments/assets/bb0e6e26-4ece-4036-a980-e65c54e2440b
+
+
+
 ## 🛠️ Tech Stack
 
 - [Vite.js](https://vitejs.dev/) – Fast development build tool

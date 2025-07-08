@@ -58,8 +58,8 @@ Make sure you have the following installed:
 
 1. **Clone the repository:**
 
-   git clone https://github.com/your-username/smart-whiteboard-app.git
-   cd smart-whiteboard-app 
+   git clone https://github.com/Abd-Elhakim-Arabet/board-scribe-insight-hub.git
+   cd board-scribe-insight-hub
 
 2.	**Install dependencies:**
    npm install
